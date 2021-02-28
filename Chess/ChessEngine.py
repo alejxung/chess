@@ -27,7 +27,7 @@ class GameState():
 
 
     """
-    Takes a Move as a parameter and executes it (will not work for castling, pawn promotion, and en-passant)
+    Takes a Move as a parameter and executes it (will not work for castling, pawn promotion, and en-passant).
     """
 
 
@@ -39,8 +39,7 @@ class GameState():
 
 
     """
-    Undo the last move made
-
+    Undo the last move made.
     """
 
 
@@ -52,6 +51,51 @@ class GameState():
             self.whiteToMove = not self.whiteToMove     # switch turns back
 
     
+    """
+    All moves considering checks.
+    """
+
+    def get_valid_moves(self):
+        return self.get_all_possible_moves()  
+
+
+    """
+    All moves without considering checks
+    """
+
+    
+    def get_all_possible_moves(self):
+        moves = [Move((6, 4), (4, 4), self.board)]
+        for r in range(len(self.board)):
+            for c in range(len(self.board[r])):
+                turn = self.board[r][c][0]
+                if (turn == "w" and self.whiteToMove) and (turn == "b" and not self.whiteToMove):
+                    piece = self.board[r][c][1]
+                    if piece == "P":
+                        self.get_pawn_moves(r, c, moves)
+                    elif piece == "R":
+                        self.get_rook_moves(r, c, moves)
+        return moves
+
+
+        """
+        Get all the pawn moves for the pawn located at row, col and add these moves to the list
+        """
+
+
+        def get_pawn_moves(self, r, c, moves):
+            pass
+
+
+        """
+        Get all the rook moves for the pawn located at row, col and add these moves to the list
+        """
+
+
+        def get_rook_moves(self, r, c, moves):
+            pass
+
+
 class Move():
     # maps keys to values
     # key : value
@@ -69,6 +113,17 @@ class Move():
         self.endCol = endSq[1]
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
+        self.moveID = self.startRow*1000 + self.startCol*100 + self.endRow*10 + self.endCol
+        print(self.moveID)
+
+    
+    """
+    Overriding the equals method.
+    """
+    def __eq__(self, other):
+        if isinstance(other, Move):
+            return self.moveID == other.moveID
+        return False
 
     def get_chess_notation(self):
         # can add to make this like real chess notation
