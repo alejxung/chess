@@ -5,6 +5,7 @@ It will also be responsible for determining the valid moves
 at the current state. It will also keep a move log.
 """
 
+
 class GameState():
     def __init__(self):
         # board is an 8x8 2D list, each element of the list has 2 characters,
@@ -24,11 +25,32 @@ class GameState():
         self.whiteToMove = True
         self.moveLog = []
 
+
+    """
+    Takes a Move as a parameter and executes it (will not work for castling, pawn promotion, and en-passant)
+    """
+
+
     def make_move(self, move):
         self.board[move.startRow][move.startCol] = "--"
         self.board[move.endRow][move.endCol] = move.pieceMoved
         self.moveLog.append(move)   # log the move so we can undo later
         self.whiteToMove = not self.whiteToMove # swap players
+
+
+    """
+    Undo the last move made
+
+    """
+
+
+    def undo_move(self):
+        if len(self.moveLog) != 0:  # make sure that there is a move to do
+            move = self.moveLog.pop()
+            self.board[move.startRow][move.startCol] = move.pieceMoved
+            self.board[move.endRow][move.endCol] = move.pieceCaptured
+            self.whiteToMove = not self.whiteToMove     # switch turns back
+
     
 class Move():
     # maps keys to values
