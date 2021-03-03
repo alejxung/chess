@@ -70,8 +70,10 @@ def main():
                     if move in validMoves:
                         gs.make_move(move)
                         moveMade = True
-                    sqSelected = ()     # reset user clicks
-                    playerClicks = []
+                        sqSelected = ()     # reset user clicks
+                        playerClicks = []
+                    else:
+                        playerClicks = [sqSelected]     # prevent wasting clicks
             
             # key handler
             elif e.type == p.KEYDOWN:
