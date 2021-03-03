@@ -22,6 +22,8 @@ class GameState():
             ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
         ]
+        self.moveFuncitons = {"P": self.get_pawn_moves, "R" :self.get_rook_moves, "N": self.get_knight_moves,
+                              "B": self.get_bishop_moves, "Q": self.get_queen_moves, "K": self.get_king_moves}
         self.whiteToMove = True
         self.moveLog = []
 
@@ -65,26 +67,45 @@ class GameState():
 
     
     def get_all_possible_moves(self):
-        moves = [Move((6, 4), (4, 4), self.board)]
+        moves = []
         for r in range(len(self.board)):
             for c in range(len(self.board[r])):
                 turn = self.board[r][c][0]
-                if (turn == "w" and self.whiteToMove) and (turn == "b" and not self.whiteToMove):
+                if (turn == "w" and self.whiteToMove) or (turn == "b" and not self.whiteToMove):
                     piece = self.board[r][c][1]
-                    if piece == "P":
-                        self.get_pawn_moves(r, c, moves)
-                    elif piece == "R":
-                        self.get_rook_moves(r, c, moves)
+                    self.moveFuncitons[piece](r, c, moves)  # calls appropriate move function baesd on piece type
         return moves
 
 
-        """
-        Get all the pawn moves for the pawn located at row, col and add these moves to the list
-        """
+    """
+    Get all the pawn moves for the pawn located at row, col and add these moves to the list
+    """
 
 
-        def get_pawn_moves(self, r, c, moves):
-            pass
+    def get_pawn_moves(self, r, c, moves):
+        if self.whiteToMove:    # white pawn moves
+            if self.board[r-1][c] == "--":  # one square pawn advance
+                moves.append(Move((r, c), (r-1, c), self.board))
+                if r == 6 and self.board[r-2][c] == "--":   # two square pawn advance
+                    moves.append(Move((r, c), (r-2, c), self.board))
+            if c-1 >= 0:
+                if self.board[r-1][c-1][0] == "b":  # enemy piece to capture
+                    moves.append(Move((r, c), (r-1, c-1), self.board))
+            if c+1 <= 7:
+                if self.board[r-1][c+1][0] == "b":
+                    moves.append(Move((r, c), (r-1, c+1), self.board))
+        
+        else:   # black pawn moves
+            if self.board[r+1][c] == "--":   # one square pawn advance
+                moves.append(Move((r, c), (r+1, c), self.board))
+                if r == 1 and self.board[r+2][c] == "--":   # two square pawn move
+                    moves.append(Move((r, c), (r+2, c), self.board))
+            if c-1 >= 0:
+                if self.board[r+1][c-1][0] == "w":
+                    moves.append(Move((r, c), (r+1, c-1), self.board))
+            if c+1 <= 7:
+                if self.board[r+1][c+1][0] == "w":
+                    moves.append(Move((r, c), (r+1, c+1), self.board))
 
 
         """
@@ -92,8 +113,44 @@ class GameState():
         """
 
 
-        def get_rook_moves(self, r, c, moves):
-            pass
+    def get_rook_moves(self, r, c, moves):
+        pass
+
+
+        """
+        Get all the knight moves for the pawn located at row, col and add these moves to the list
+        """
+
+
+    def get_knight_moves(self, r, c, moves):
+        pass
+
+
+        """
+        Get all the bishop moves for the pawn located at row, col and add these moves to the list
+        """
+
+
+    def get_bishop_moves(self, r, c, moves):
+        pass
+
+
+        """
+        Get all the queen moves for the pawn located at row, col and add these moves to the list
+        """
+
+
+    def get_queen_moves(self, r, c, moves):
+        pass
+
+
+        """
+        Get all the king moves for the pawn located at row, col and add these moves to the list
+        """
+
+
+    def get_king_moves(self, r, c, moves):
+        pass
 
 
 class Move():
@@ -114,7 +171,6 @@ class Move():
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
         self.moveID = self.startRow*1000 + self.startCol*100 + self.endRow*10 + self.endCol
-        print(self.moveID)
 
     
     """

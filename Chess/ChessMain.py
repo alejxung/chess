@@ -10,14 +10,14 @@ import ChessEngine
 WIDTH = HEIGHT = 512  # another option is 400
 DIMENSION = 8  # dimensions of a chess board are 8x8
 SQ_SIZE = HEIGHT // DIMENSION
-MAX_FPS = 15  # for animations
+MAX_FPS = 60  # for animations
 IMAGES = {}
 
 
 
 """
 Initialize a global dictionary of images. 
-This will be called exactly once in the main.
+This will be called exactly once inhe main.
 """
 
 
