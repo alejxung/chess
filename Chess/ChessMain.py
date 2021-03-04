@@ -26,7 +26,7 @@ def load_images():
     for piece in pieces:
         # NOTE: we can access an image by saying IMAGES["wp"]
         # images are scaled by SQ_SIZE
-        IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE))
+        IMAGES[piece] = p.transform.scale(p.image.load("Chess/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE))
 
 
 """
@@ -67,12 +67,13 @@ def main():
                 if len(playerClicks) == 2:      # after second click
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                     print(move.get_chess_notation())
-                    if move in validMoves:
-                        gs.make_move(move)
-                        moveMade = True
-                        sqSelected = ()     # reset user clicks
-                        playerClicks = []
-                    else:
+                    for i in range(len(validMoves)):
+                        if move == validMoves[i]:
+                            gs.make_move(move)
+                            moveMade = True
+                            sqSelected = ()     # reset user clicks
+                            playerClicks = []
+                    if not moveMade:
                         playerClicks = [sqSelected]     # prevent wasting clicks
             
             # key handler
