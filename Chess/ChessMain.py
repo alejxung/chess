@@ -1,132 +1,124 @@
-"""
-This is our main driver file. It will be responsible for 
-handling over input and displaying the current GameState object.
-"""
-
+'''
+Main driver file.
+Handling user input.
+Displaying current GameStatus object.
+'''
 
 import pygame as p
 import ChessEngine
+import sys
 
-WIDTH = HEIGHT = 512  # another option is 400
-DIMENSION = 8  # dimensions of a chess board are 8x8
-SQ_SIZE = HEIGHT // DIMENSION
-MAX_FPS = 60  # for animations
+WIDTH = HEIGHT = 512
+DIMENSION = 8
+SQUARE_SIZE = HEIGHT // DIMENSION
+MAX_FPS = 60
 IMAGES = {}
 
 
-
-"""
-Initialize a global dictionary of images. 
-This will be called exactly once inhe main.
-"""
-
-
-def load_images():
-    pieces = ["wP", "wR", "wN", "wB", "wK", "wQ", "bP", "bR", "bN", "bB", "bK", "bQ", ]
+def loadImages():
+    '''
+    Initialize a global directory of images.
+    This will be called exactly once in the main.
+    '''
+    pieces = ['wP', 'wR', 'wN', 'wB' ,'wK', 'wQ', 'bP', 'bR', 'bN', 'bB', 'bK', 'bQ']
     for piece in pieces:
-        # NOTE: we can access an image by saying IMAGES["wp"]
-        # images are scaled by SQ_SIZE
-        IMAGES[piece] = p.transform.scale(p.image.load("Chess/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE))
-
-
-"""
-The main driver for our code. 
-This will handle user input and updating the graphics.
-"""
-
-
+        IMAGES[piece] = p.transform.scale(p.image.load("chess/images/" + piece + ".png"), (SQUARE_SIZE,SQUARE_SIZE))
+        
+        
 def main():
+    '''
+    The main driver for our code.
+    This will handle user input and updating the graphics.
+    '''
     p.init()
     screen = p.display.set_mode((WIDTH, HEIGHT))
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
-    gs = ChessEngine.GameState()  # calling constructor
-    validMoves = gs.get_valid_moves()
-    moveMade = False    # flag variable for when a move is made
-    load_images()  # only do this once, before while loop
-    running = True
-    sqSelected = () # no square is selecetd, keep track of the last click of the user - tuple: (row, col)
-    playerClicks = []   # keep track of player clicks - two tuples: [(6, 4), (4, 4)]
+    game_state = ChessEngine.GameState()
+    valid_moves = game_state.getValidMoves()
+    move_made = False #flag variable for when a move is made
     
+    loadImages() #do this only once before while loop
+    
+    running = True
+    square_selected = () #no square is selected initially, this will keep track of the last click of the user (tuple(row,col))
+    player_clicks = [] #this will keep track of player clicks (two tuples)
+
     while running:
-        for e in p.event.get():
+        for e in p.event.get():  
             if e.type == p.QUIT:
                 running = False
-            
-            # mouse handler
+                p.quit()
+                sys.exit()
+            #mouse handler            
             elif e.type == p.MOUSEBUTTONDOWN:
-                location = p.mouse.get_pos()    # (x, y) location of mouse
-                col = location[0]//SQ_SIZE
-                row = location[1]//SQ_SIZE
-                if sqSelected == (row, col):    # user clicked the same square => undo
-                    sqSelected = ()             # deselect
-                    playerClicks = []           # clear player clicks
+                location = p.mouse.get_pos() #(x, y) location of the mouse
+                col = location[0] // SQUARE_SIZE
+                row = location[1] // SQUARE_SIZE
+                if square_selected == (row, col): #user clicked the same square twice
+                    square_selected = () #deselect
+                    player_clicks = [] #clear clicks
                 else:
-                    sqSelected = (row, col)
-                    playerClicks.append(sqSelected) # append for both first and second clikcs
-                if len(playerClicks) == 2:      # after second click
-                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                    print(move.get_chess_notation())
-                    for i in range(len(validMoves)):
-                        if move == validMoves[i]:
-                            gs.make_move(move)
-                            moveMade = True
-                            sqSelected = ()     # reset user clicks
-                            playerClicks = []
-                    if not moveMade:
-                        playerClicks = [sqSelected]     # prevent wasting clicks
-            
-            # key handler
+                    square_selected = (row, col)
+                    player_clicks.append(square_selected) #append for both 1st and 2nd click
+                if len(player_clicks) == 2: #after 2nd click                                                                    
+                    move = ChessEngine.Move(player_clicks[0], player_clicks[1], game_state.board)  
+                    for i in range(len(valid_moves)):
+                        if move == valid_moves[i]:
+                            print(move.getChessNotation()) 
+                            game_state.makeMove(valid_moves[i])
+                            move_made = True
+                            square_selected = () #reset user clicks
+                            player_clicks = [] 
+                    if not move_made:
+                        player_clicks = [square_selected]
+            #key handler
             elif e.type == p.KEYDOWN:
-                if e.key == p.K_z:  # undo when "z" is pressed
-                    gs.undo_move()
-                    moveMade = True
-
-        if moveMade:
-            validMoves = gs.get_valid_moves()
-            moveMade = False
-
-        draw_game_state(screen, gs)
+                if e.key == p.K_z: #undo when 'z' is pressed
+                    game_state.undoMove()
+                    move_made = True
+                    
+        if move_made:
+            valid_moves = game_state.getValidMoves()
+            move_made = False
+                    
+                            
+        drawGameState(screen, game_state) 
         clock.tick(MAX_FPS)
         p.display.flip()
 
 
-"""
-Responsible for all the graphics within a current game state.
-"""
+def drawGameState(screen, game_state):
+    '''
+    Responsible for all the graphics within current game state.
+    '''
+    drawBoard(screen) #draw squares on the board
+    #add in piece highlighting or move suggestions (later)
+    drawPieces(screen, game_state.board) #draw pieces on top of those squares      
 
 
-def draw_game_state(screen, gs):
-    draw_board(screen)  # draw squares on the board
-    # add in piece highlighting or move suggestions
-    draw_pieces(screen, gs.board)  # draw pieces on top of those squares
-
-
-"""
-Draw the squares on the board. The top left square is always light.
-"""
-
-
-def draw_board(screen):
+def drawBoard(screen):
+    '''
+    Draw the squares on the board.
+    The top left square is always light.
+    '''
     colors = [p.Color("white"), p.Color("gray")]
-    for r in range(DIMENSION):
-        for c in range(DIMENSION):
-            color = colors[((r + c) % 2)]
-            p.draw.rect(screen, color, p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+    for row in range(DIMENSION):
+        for column in range(DIMENSION):
+            color = colors[((row+column) % 2)]
+            p.draw.rect(screen, color, p.Rect(column*SQUARE_SIZE, row*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+    
 
-
-"""
-Draw the pieces on the board using the current GameState.board
-"""
-
-
-def draw_pieces(screen, board):
-    for r in range(DIMENSION):
-        for c in range(DIMENSION):
-            piece = board[r][c]
-            if piece != "--":  # not empty square
-                screen.blit(IMAGES[piece], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
-
-
+def drawPieces(screen, board):
+    '''
+    Draw the pieces on the board using the current game_state.board
+    '''
+    for row in range(DIMENSION):
+        for column in range(DIMENSION):
+            piece = board[row][column]
+            if piece != "--":
+                screen.blit(IMAGES[piece], p.Rect(column*SQUARE_SIZE, row*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+         
+                
 if __name__ == "__main__":
     main()
