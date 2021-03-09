@@ -1,8 +1,8 @@
-'''
+"""
 Main driver file.
 Handling user input.
 Displaying current GameStatus object.
-'''
+"""
 
 import pygame as p
 import ChessEngine
@@ -15,21 +15,25 @@ MAX_FPS = 60
 IMAGES = {}
 
 
+"""
+Initialize a global directory of images.
+This will be called exactly once in the main.
+"""
+
+
 def loadImages():
-    '''
-    Initialize a global directory of images.
-    This will be called exactly once in the main.
-    '''
     pieces = ['wP', 'wR', 'wN', 'wB' ,'wK', 'wQ', 'bP', 'bR', 'bN', 'bB', 'bK', 'bQ']
     for piece in pieces:
         IMAGES[piece] = p.transform.scale(p.image.load("chess/images/" + piece + ".png"), (SQUARE_SIZE,SQUARE_SIZE))
         
         
+"""
+The main driver for our code.
+This will handle user input and updating the graphics.
+"""
+
+
 def main():
-    '''
-    The main driver for our code.
-    This will handle user input and updating the graphics.
-    '''
     p.init()
     screen = p.display.set_mode((WIDTH, HEIGHT))
     clock = p.time.Clock()
@@ -88,20 +92,24 @@ def main():
         p.display.flip()
 
 
+"""
+Responsible for all the graphics within current game state.
+"""
+    
+
 def drawGameState(screen, game_state):
-    '''
-    Responsible for all the graphics within current game state.
-    '''
     drawBoard(screen) #draw squares on the board
     #add in piece highlighting or move suggestions (later)
     drawPieces(screen, game_state.board) #draw pieces on top of those squares      
 
 
+"""
+Draw the squares on the board.
+The top left square is always light.
+"""
+
+
 def drawBoard(screen):
-    '''
-    Draw the squares on the board.
-    The top left square is always light.
-    '''
     colors = [p.Color("white"), p.Color("gray")]
     for row in range(DIMENSION):
         for column in range(DIMENSION):
@@ -109,10 +117,12 @@ def drawBoard(screen):
             p.draw.rect(screen, color, p.Rect(column*SQUARE_SIZE, row*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
     
 
+"""
+Draw the pieces on the board using the current game_state.board
+"""
+
+
 def drawPieces(screen, board):
-    '''
-    Draw the pieces on the board using the current game_state.board
-    '''
     for row in range(DIMENSION):
         for column in range(DIMENSION):
             piece = board[row][column]
