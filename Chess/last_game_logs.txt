@@ -1,0 +1,3 @@
+1. Pf4 Pe5
+2. Pg4 Qh4++
+result: 0-1
