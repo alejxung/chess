@@ -28,8 +28,8 @@ class GameState():
         self.move_log = []
         self.white_king_location = (7,4)
         self.black_king_location = (0,4)
-        self.check_mate = False
-        self.stale_mate = False
+        self.checkmate = False
+        self.stalemate = False
         self.in_check = False
         self.pins = []
         self.checks = []
@@ -97,6 +97,7 @@ class GameState():
             self.board[move.start_row][move.start_col] = move.piece_moved
             self.board[move.end_row][move.end_col] = move.piece_captured
             self.white_to_move = not self.white_to_move # swap players
+            
             # update the king's position if needed
             if move.piece_moved == "wK":
                 self.white_king_location = (move.start_row, move.start_col)
@@ -106,7 +107,7 @@ class GameState():
             # undo en passant move
             if move.is_enpassant_move:
                 self.board[move.end_row][move.end_col] = "--" # leave landing square blank
-                self.board[move.start_row][move.end_col] == move.piece_captured
+                self.board[move.start_row][move.end_col] = move.piece_captured
                 self.enpassant_possible = (move.end_row, move.end_col)
             
             # undo a 2 square pawn advance 
@@ -206,12 +207,12 @@ class GameState():
         
         if len(moves) == 0:
             if self.inCheck():
-                self.check_mate = True
+                self.checkmate = True
             else:
-                self.stale_mate = True
+                self.stalemate = True
         else:
-            self.check_mate = False
-            self.stale_mate = False
+            self.checkmate = False
+            self.stalemate = False
         
         return moves
     
@@ -481,8 +482,8 @@ class GameState():
 
 
     def getKingMoves(self, row, col, moves):
-        row_moves = (-1, -1, -1, 0, 0, 0, 1, 1, 1)
-        col_moves = (-1, 0, 1, -1, 0, 1, -1, 0, 1)
+        row_moves = (-1, -1, -1, 0, 0, 1, 1, 1)
+        col_moves = (-1, 0, 1, -1, 1, -1, 0, 1)
         ally_color = "w" if self.white_to_move else "b"
         for i in range(8):
             end_row = row + row_moves[i]
@@ -591,9 +592,3 @@ class Move():
     
     def getRankFile(self, row, col):
         return self.cols_to_files[col] + self.rows_to_ranks[row]
-        
-        
-        
-        
-        
-        
